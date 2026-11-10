@@ -45,7 +45,7 @@ body{background:#0a0f1e;color:white;min-height:100vh}
 <select id="cat" class="input"><option>Load Shedding</option><option>Water</option><option>Pothole</option><option>Clinic</option><option>Road Closed</option></select>
 <button class="btn" onclick="addAlert()">Send Alert</button>
 </div>
-<div style="display:flex;gap:6px;overflow:auto;margin-top:14px;padding-bottom:4px"><button class="chip" onclick="setFilter('All',this)" id="fAll" style="cursor:pointer">All</button><button class="chip" onclick="setFilter('Load Shedding',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Load Shedding</button><button class="chip" onclick="setFilter('Water',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Water</button><button class="chip" onclick="setFilter('Pothole',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Pothole</button><button class="chip" onclick="setFilter('Clinic',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Clinic</button></div><p class="small" id="filterInfo" style="margin-top:8px">Showing: All alerts</p><div class="feed"><h3>Near You - Pretoria</h3><div id="list"></div></div>
+<input id="search" class="input" placeholder="Search area - e.g. Soshanguve" oninput="setSearch(this.value)" style="margin-top:14px"><div style="display:flex;gap:6px;overflow:auto;margin-top:10px;padding-bottom:4px"><button class="chip" onclick="setFilter('All',this)" id="fAll" style="cursor:pointer">All</button><button class="chip" onclick="setFilter('Load Shedding',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Load Shedding</button><button class="chip" onclick="setFilter('Water',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Water</button><button class="chip" onclick="setFilter('Pothole',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Pothole</button><button class="chip" onclick="setFilter('Clinic',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Clinic</button></div><p class="small" id="filterInfo" style="margin-top:8px">Showing: All alerts</p><div class="feed"><h3>Near You - Pretoria</h3><div id="list"></div></div>
 </div>
 <script>
 let alerts = JSON.parse(localStorage.getItem('mzansi_alerts')||'[]');
@@ -56,12 +56,12 @@ if(alerts.length===0){
   {cat:'Pothole',area:'Pretoria CBD',title:'Big pothole near Church Square, drive slow',time:'Today 14:20'}
  ];
 }
-let curFilter='All';
+let curFilter='All'; let curSearch=''; function setSearch(v){curSearch=v.toLowerCase().trim(); render();}
 function render(){
  let list=document.getElementById('list');
- let shown=alerts.filter(a=>curFilter==='All'||a.cat===curFilter);
+ let shown=alerts.filter(a=>(curFilter==='All'||a.cat===curFilter) && (!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch)));
  if(shown.length===0){list.innerHTML='<div class="alert"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>`<div class="alert"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p></div>`).join('');}
- let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')';
+ let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')'+(curSearch?' - Search: '+curSearch:'');
 }
 function setFilter(c,el){curFilter=c;document.querySelectorAll('.chip').forEach(ch=>{if(ch.id!=='fAll'&&ch.parentElement&&ch.parentElement.style&&ch.parentElement.style.display==='flex'){ch.style.background='rgba(255,255,255,.15)';ch.style.color='white';}});if(el){el.style.background='white';el.style.color='black';}render();}
 function showForm(){let f=document.getElementById('form'); f.style.display = f.style.display==='none' ? 'block':'none';}
