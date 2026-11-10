@@ -60,10 +60,11 @@ let curFilter='All'; let curSearch=''; function setSearch(v){curSearch=v.toLower
 function render(){
  let list=document.getElementById('list');
  let shown=alerts.filter(a=>(curFilter==='All'||a.cat===curFilter) && (!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch)));
- if(shown.length===0){list.innerHTML='<div class="alert"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>`<div class="alert"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p></div>`).join('');}
+ if(shown.length===0){list.innerHTML='<div class="alert"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>{let idx=alerts.indexOf(a); return `<div class="alert"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p><button onclick="delAlert(${idx})" style="margin-top:8px;padding:6px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:11px;cursor:pointer">Delete</button></div>`;}).join('');}
  let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')'+(curSearch?' - Search: '+curSearch:'');
 }
 function setFilter(c,el){curFilter=c;document.querySelectorAll('.chip').forEach(ch=>{if(ch.id!=='fAll'&&ch.parentElement&&ch.parentElement.style&&ch.parentElement.style.display==='flex'){ch.style.background='rgba(255,255,255,.15)';ch.style.color='white';}});if(el){el.style.background='white';el.style.color='black';}render();}
+function delAlert(i){if(!confirm('Delete this alert?'))return; alerts.splice(i,1); localStorage.setItem('mzansi_alerts',JSON.stringify(alerts)); render();}
 function showForm(){let f=document.getElementById('form'); f.style.display = f.style.display==='none' ? 'block':'none';}
 function setCat(c){setFilter(c,null); document.getElementById('list').scrollIntoView({behavior:'smooth'});}
 function addAlert(){
