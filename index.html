@@ -6,9 +6,15 @@
 <title>Mzansi Alert - Know What Is Happening Near You</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
-body{background:#0a0f1e;color:white;min-height:100vh}
+body{background:#0a0f1e;color:white;min-height:100vh;background-image:linear-gradient(135deg,#0a0f1e,#1a0b2e,#0b2e1a);background-attachment:fixed}
 .app{max-width:430px;margin:0 auto;padding:16px;padding-bottom:100px}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.glass{background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.08));backdrop-filter:blur(25px) saturate(180%);-webkit-backdrop-filter:blur(25px) saturate(180%);border:1px solid rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 12px 32px rgba(0,0,0,.35)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:22px}
+.cityRow{display:flex;gap:10px;overflow:auto;margin-top:14px;padding-bottom:6px}
+.cityCard{min-width:130px;height:130px;border-radius:20px;overflow:hidden;position:relative;cursor:pointer;flex-shrink:0}
+.cityCard img{width:100%;height:100%;object-fit:cover}
+.cityName{position:absolute;bottom:0;left:0;right:0;padding:10px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-weight:800;font-size:13px}
+.cityName small{display:block;font-weight:400;font-size:10px;opacity:.8}
 .logo{font-weight:800;font-size:18px}
 .logo span{color:#ffb300}
 .badge{background:#00e5a8;color:black;font-size:10px;font-weight:800;padding:4px 8px;border-radius:100px}
@@ -30,13 +36,23 @@ body{background:#0a0f1e;color:white;min-height:100vh}
 </head>
 <body>
 <div class="app">
-<div class="top"><div class="logo">Mzansi <span>Alert</span></div><div class="badge">PRETORIA LIVE</div></div>
-<div class="hero"><h1>Know what is happening near you.</h1><p>Load shedding, water, potholes, clinic, roads. Reported by people near you.</p></div>
+<div class="top glass"><div class="logo">Mzansi <span>Alert</span></div><div class="badge">PRETORIA LIVE</div></div>
+<div class="hero glass" style="padding:18px;border-radius:24px"><h1>Know what is happening near you.</h1><p>Load shedding, water, potholes, clinic, roads. Reported by people near you.</p></div>
+<h3 style="margin-top:16px;font-size:15px">Cities - Tap to see that city</h3>
+<div class="cityRow">
+<div class="cityCard glass" onclick="setCity('Pretoria')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><div class="cityName">Pretoria<small>Capital - Gauteng</small></div></div>
+<div class="cityCard glass" onclick="setCity('Johannesburg')"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600" loading="lazy"><div class="cityName">Johannesburg<small>Joburg - Gauteng</small></div></div>
+<div class="cityCard glass" onclick="setCity('Cape Town')"><img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600" loading="lazy"><div class="cityName">Cape Town<small>Table Mountain</small></div></div>
+<div class="cityCard glass" onclick="setCity('Durban')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><div class="cityName">Durban<small>Beach - KZN</small></div></div>
+<div class="cityCard glass" onclick="setCity('Soweto')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><div class="cityName">Soweto<small>Joburg - Gauteng</small></div></div>
+<div class="cityCard glass" onclick="setCity('Polokwane')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><div class="cityName">Polokwane<small>Limpopo</small></div></div>
+</div>
+<p class="small" id="cityInfo" style="margin-top:8px">Showing: All cities</p>
 <div class="grid">
-<div class="card" onclick="setCat('Load Shedding')"><b>Load Shedding</b><p>Power off in your area</p></div>
-<div class="card" onclick="setCat('Water')"><b>Water Outage</b><p>No water, burst pipe</p></div>
-<div class="card" onclick="setCat('Pothole')"><b>Pothole</b><p>Bad road, car danger</p></div>
-<div class="card" onclick="setCat('Clinic')"><b>Clinic</b><p>Stock out, long queue</p></div>
+<div class="card glass" onclick="setCat('Load Shedding')"><b>Load Shedding</b><p>Power off in your area</p></div>
+<div class="card glass" onclick="setCat('Water')"><b>Water Outage</b><p>No water, burst pipe</p></div>
+<div class="card glass" onclick="setCat('Pothole')"><b>Pothole</b><p>Bad road, car danger</p></div>
+<div class="card glass" onclick="setCat('Clinic')"><b>Clinic</b><p>Stock out, long queue</p></div>
 </div>
 <button class="btn" onclick="showForm()">+ Report An Alert</button>
 <div id="form" style="display:none;margin-top:12px">
@@ -53,15 +69,19 @@ if(alerts.length===0){
  alerts=[
   {cat:'Load Shedding',area:'Soshanguve',title:'Stage 4 - Power off from 18:00 to 20:30',time:'Today 17:40'},
   {cat:'Water',area:'Mamelodi',title:'Burst pipe on Tsamaya Road, no water',time:'Today 16:10'},
-  {cat:'Pothole',area:'Pretoria CBD',title:'Big pothole near Church Square, drive slow',time:'Today 14:20'}
+  {cat:'Pothole',area:'Pretoria CBD',title:'Big pothole near Church Square, drive slow',time:'Today 14:20'},
+  {cat:'Load Shedding',area:'Johannesburg - Soweto',title:'Stage 2 - Power off 20:00 to 22:30',time:'Today 18:10'},
+  {cat:'Water',area:'Cape Town - Khayelitsha',title:'Water truck coming at 9am tomorrow',time:'Today 15:00'},
+  {cat:'Pothole',area:'Durban - Umlazi',title:'Road flooded after rain, drive slow',time:'Today 13:00'}
  ];
 }
-let curFilter='All'; let curSearch=''; function setSearch(v){curSearch=v.toLowerCase().trim(); render();}
+let curFilter='All'; let curSearch=''; let curCity='All'; function setCity(c){curCity=c; let info=document.getElementById('cityInfo'); if(info) info.textContent='Showing city: '+c+' - Tap All to clear'; render(); document.getElementById('list').scrollIntoView({behavior:'smooth'});}
+function setSearch(v){curSearch=v.toLowerCase().trim(); render();}
 function render(){
  let list=document.getElementById('list');
- let shown=alerts.filter(a=>(curFilter==='All'||a.cat===curFilter) && (!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch)));
- if(shown.length===0){list.innerHTML='<div class="alert"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>{let idx=alerts.indexOf(a); return `<div class="alert"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p><button onclick="delAlert(${idx})" style="margin-top:8px;padding:6px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:11px;cursor:pointer">Delete</button></div>`;}).join('');}
- let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')'+(curSearch?' - Search: '+curSearch:'');
+ let shown=alerts.filter(a=>{let okCat=(curFilter==='All'||a.cat===curFilter); let okSearch=(!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch)); let okCity=true; if(curCity!=='All'){ if(curCity==='Pretoria'){ okCity = a.area.includes('Pretoria')||a.area.includes('Soshanguve')||a.area.includes('Mamelodi')||a.area.includes('Centurion'); } else { okCity = a.area.toLowerCase().includes(curCity.toLowerCase()); } } return okCat && okSearch && okCity;});
+ if(shown.length===0){list.innerHTML='<div class="alert glass"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>{let idx=alerts.indexOf(a); return `<div class="alert glass"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p><button onclick="delAlert(${idx})" style="margin-top:8px;padding:6px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:11px;cursor:pointer">Delete</button></div>`;}).join('');}
+ let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')'+(curSearch?' - Search: '+curSearch:'')+(curCity!=='All'?' - City: '+curCity:'');
 }
 function setFilter(c,el){curFilter=c;document.querySelectorAll('.chip').forEach(ch=>{if(ch.id!=='fAll'&&ch.parentElement&&ch.parentElement.style&&ch.parentElement.style.display==='flex'){ch.style.background='rgba(255,255,255,.15)';ch.style.color='white';}});if(el){el.style.background='white';el.style.color='black';}render();}
 function delAlert(i){if(!confirm('Delete this alert?'))return; alerts.splice(i,1); localStorage.setItem('mzansi_alerts',JSON.stringify(alerts)); render();}
