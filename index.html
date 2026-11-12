@@ -1,104 +1,461 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mzansi Alert - Know What Is Happening Near You</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
-body{background:#0a0f1e;color:white;min-height:100vh;background-image:linear-gradient(135deg,#0a0f1e,#1a0b2e,#0b2e1a);background-attachment:fixed}
-.app{max-width:430px;margin:0 auto;padding:16px;padding-bottom:100px}
-.glass{background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.08));backdrop-filter:blur(25px) saturate(180%);-webkit-backdrop-filter:blur(25px) saturate(180%);border:1px solid rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 12px 32px rgba(0,0,0,.35)}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:22px}
-.cityRow{display:flex;gap:10px;overflow:auto;margin-top:14px;padding-bottom:6px}
-.cityCard{min-width:130px;height:130px;border-radius:20px;overflow:hidden;position:relative;cursor:pointer;flex-shrink:0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+body{background:#070b16;color:white;min-height:100vh;background-image:radial-gradient(600px 300px at 20% 0%,rgba(255,42,69,.25),transparent),radial-gradient(600px 300px at 90% 20%,rgba(0,229,168,.18),transparent),linear-gradient(180deg,#070b16,#0a0f1e);background-attachment:fixed}
+.app{max-width:430px;margin:0 auto;padding:14px;padding-bottom:110px}
+.glass{background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.28);border-top:1px solid rgba(255,255,255,.55);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.topRow{display:flex;justify-content:space-between;align-items:center;padding:6px 2px}
+.avatar{width:44px;height:44px;border-radius:100px;background:linear-gradient(135deg,#ff2a45,#ffb300);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}
+.bell{width:40px;height:40px;border-radius:100px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.searchBar{margin-top:12px;padding:14px 16px;border-radius:100px;display:flex;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.7)}
+.searchBar input{flex:1;background:transparent;border:none;outline:none;color:white;font-size:15px}
+.searchBar input::placeholder{color:rgba(255,255,255,.6)}
+.heroImg{margin-top:14px;height:190px;border-radius:26px;overflow:hidden;position:relative}
+.heroImg img{width:100%;height:100%;object-fit:cover}
+.heroOverlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,.15));padding:16px;display:flex;flex-direction:column;justify-content:flex-end}
+.heroOverlay h1{font-size:24px;line-height:1.1}
+.heroOverlay p{font-size:12px;opacity:.85;margin-top:6px}
+.liveTicker{margin-top:12px;padding:10px 14px;border-radius:100px;display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700}
+.dot{width:9px;height:9px;background:#ff2a45;border-radius:100px;animation:pulse 1.2s infinite;flex-shrink:0}
+@keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}100%{transform:scale(1);opacity:1}}
+.quick{display:flex;gap:10px;margin-top:14px;overflow:auto;padding-bottom:4px}.quickBtn{min-width:105px;flex-shrink:0}
+.quickBtn{padding:12px 6px;border-radius:20px;text-align:center;cursor:pointer}
+.quickBtn span{font-size:22px;display:block}
+.quickBtn b{font-size:11px;display:block;margin-top:6px;line-height:1.2}
+.quickBtn small{font-size:10px;opacity:.6}
+.sectionTitle{margin-top:18px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
+.sectionTitle span{font-size:11px;opacity:.6;font-weight:400}
+.trendRow{display:flex;gap:10px;overflow:auto;margin-top:10px;padding-bottom:4px}
+.trendCard{min-width:220px;padding:12px;border-radius:20px}
+.cityRow{display:flex;gap:10px;overflow:auto;margin-top:10px;padding-bottom:6px}
+.cityCard{min-width:140px;height:150px;border-radius:22px;overflow:hidden;position:relative;cursor:pointer;flex-shrink:0}
 .cityCard img{width:100%;height:100%;object-fit:cover}
-.cityName{position:absolute;bottom:0;left:0;right:0;padding:10px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-weight:800;font-size:13px}
-.cityName small{display:block;font-weight:400;font-size:10px;opacity:.8}
-.logo{font-weight:800;font-size:18px}
-.logo span{color:#ffb300}
-.badge{background:#00e5a8;color:black;font-size:10px;font-weight:800;padding:4px 8px;border-radius:100px}
-.hero{margin-top:14px;padding:18px;border-radius:22px;background:linear-gradient(135deg,#ff2a45,#ff7a00)}
-.hero h1{font-size:26px;line-height:1.05}
-.hero p{font-size:13px;opacity:.9;margin-top:8px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px;cursor:pointer}
-.card b{font-size:14px}
-.card p{font-size:11px;opacity:.65;margin-top:4px}
-.btn{width:100%;border:none;padding:14px;border-radius:100px;font-weight:800;color:white;background:linear-gradient(135deg,#ff2a45,#ff5a8a);font-size:15px;margin-top:14px;cursor:pointer}
-.input{width:100%;padding:13px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);color:white;margin:6px 0;font-size:15px}
-.feed{margin-top:16px}
-.alert{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px;margin-top:10px}
-.alert b{font-size:14px}
+.cityName{position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);font-weight:800;font-size:14px}
+.cityName small{display:block;font-weight:400;font-size:11px;opacity:.85}
+.cityBadge{position:absolute;top:8px;right:8px;background:white;color:black;font-size:10px;font-weight:800;padding:4px 8px;border-radius:100px}
+.feed{margin-top:14px}
+.alert{border-radius:22px;overflow:hidden;margin-top:12px}
+.alertImg{height:130px;position:relative}
+.alertImg img{width:100%;height:100%;object-fit:cover}
+.alertImg span{position:absolute;top:10px;left:10px;background:white;color:black;padding:5px 10px;border-radius:100px;font-size:11px;font-weight:800}
+.alertBody{padding:14px}
+.alertBody b{font-size:15px;line-height:1.3;display:block}
+.chip{display:inline-block;padding:5px 10px;border-radius:100px;font-size:10px;font-weight:800;background:white;color:black}
 .small{font-size:12px;opacity:.65}
-.chip{display:inline-block;padding:5px 10px;border-radius:100px;font-size:10px;font-weight:800;background:white;color:black;margin-top:6px}
+.btn{width:100%;border:none;padding:15px;border-radius:100px;font-weight:800;color:white;background:linear-gradient(135deg,#ff2a45,#ff5a8a);font-size:15px;margin-top:14px;cursor:pointer;box-shadow:0 8px 20px rgba(255,42,69,.4)}
+.input{width:100%;padding:14px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);color:white;margin:6px 0;font-size:15px}
+.confirmBtn{padding:8px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;cursor:pointer;background:#ffb300;color:black}
+.delBtn{padding:8px 12px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:11px;cursor:pointer}
+.bottomNav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:92%;max-width:400px;display:flex;justify-content:space-around;padding:8px;border-radius:100px;z-index:50}
+.navI{flex:1;text-align:center;font-size:11px;font-weight:700;cursor:pointer;opacity:.7;padding:8px 4px;border-radius:100px}
+.navI.active{background:white;color:black;opacity:1}
+.seeAll{font-size:12px;color:#ffb300;font-weight:700;cursor:pointer;background:none;border:none}
+.picTop{height:70px;border-radius:14px;overflow:hidden;margin-bottom:8px}
+.picTop img{width:100%;height:100%;object-fit:cover}
+.trendCard img{width:100%;height:80px;object-fit:cover;border-radius:12px;margin-bottom:8px}
+.profileCover{height:110px;border-radius:20px;overflow:hidden;position:relative;margin-top:14px}
+.profileCover img{width:100%;height:100%;object-fit:cover}
+.howPic{height:50px;border-radius:10px;overflow:hidden;margin-bottom:6px}
+.howPic img{width:100%;height:100%;object-fit:cover}
+.notifPanel{position:fixed;top:70px;left:50%;transform:translateX(-50%);width:92%;max-width:400px;padding:16px;border-radius:22px;z-index:100}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:100}
+.modalCard{width:100%;max-width:430px;max-height:85vh;overflow:auto;padding:18px;border-radius:26px 26px 0 0}
+
+
+.how{margin-top:14px;padding:14px;border-radius:22px;display:flex;gap:10px}
+.how div{flex:1;text-align:center}
+.how b{font-size:12px}
+.how p{font-size:11px;opacity:.65;margin-top:4px;line-height:1.4}
+.profileCard{padding:18px;border-radius:26px;text-align:center}
+.profileAvatar{width:90px;height:90px;border-radius:100px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;background:linear-gradient(135deg,#ff2a45,#ffb300);border:3px solid rgba(255,255,255,.6)}
+.statRow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.statBox{padding:12px;border-radius:18px;text-align:center}
+.statBox b{font-size:20px;display:block}
+.statBox small{font-size:11px;opacity:.65}
+.feedBar{display:flex;gap:8px;overflow:auto;margin-top:10px;padding-bottom:4px}
+.sortBtn{padding:8px 12px;border-radius:100px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:white;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.sortBtn.active{background:white;color:black}
+.commentBox{margin-top:10px;padding:10px;border-radius:14px;background:rgba(0,0,0,.25)}
+.commentInput{width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:white;font-size:13px;margin-top:6px}
+.actionRow{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+
 </style>
 </head>
 <body>
 <div class="app">
-<div class="top glass"><div class="logo">Mzansi <span>Alert</span></div><div class="badge">PRETORIA LIVE</div></div>
-<div class="hero glass" style="padding:18px;border-radius:24px"><h1>Know what is happening near you.</h1><p>Load shedding, water, potholes, clinic, roads. Reported by people near you.</p></div>
-<h3 style="margin-top:16px;font-size:15px">Cities - Tap to see that city</h3>
-<div class="cityRow">
-<div class="cityCard glass" onclick="setCity('Pretoria')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><div class="cityName">Pretoria<small>Capital - Gauteng</small></div></div>
-<div class="cityCard glass" onclick="setCity('Johannesburg')"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600" loading="lazy"><div class="cityName">Johannesburg<small>Joburg - Gauteng</small></div></div>
-<div class="cityCard glass" onclick="setCity('Cape Town')"><img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600" loading="lazy"><div class="cityName">Cape Town<small>Table Mountain</small></div></div>
-<div class="cityCard glass" onclick="setCity('Durban')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><div class="cityName">Durban<small>Beach - KZN</small></div></div>
-<div class="cityCard glass" onclick="setCity('Soweto')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><div class="cityName">Soweto<small>Joburg - Gauteng</small></div></div>
-<div class="cityCard glass" onclick="setCity('Polokwane')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><div class="cityName">Polokwane<small>Limpopo</small></div></div>
+<div class="topRow"><div style="display:flex;gap:10px;align-items:center"><div class="avatar" onclick="showProfile()" style="cursor:pointer">T</div><div><div style="font-size:12px;opacity:.7">Sawubona 👋</div><b style="font-size:16px">Tshire, Pretoria</b><div style="font-size:11px;opacity:.6">Gauteng • Today is a good day</div></div></div><div class="bell glass" onclick="showNotifications()" style="cursor:pointer">🔔<span id="notifCount" style="position:absolute;margin-left:18px;margin-top:-18px;background:#ff2a45;color:white;font-size:10px;font-weight:800;padding:2px 6px;border-radius:100px">3</span></div></div>
+
+<div class="searchBar glass">🔍 <input id="search" placeholder="Search area - e.g. Soshanguve" oninput="setSearch(this.value)"><button class="delBtn" onclick="clearSearch()" style="margin-top:8px">Clear Search ↺</button></div>
+
+<div class="heroImg glass"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800"><div class="heroOverlay"><span style="background:#00e5a8;color:black;font-size:10px;font-weight:800;padding:4px 8px;border-radius:100px;align-self:flex-start">PRETORIA LIVE</span><h1>Know what is happening near you.</h1><p>Load shedding, water, potholes, clinic. Reported by people near you.</p><button class="btn" style="margin-top:10px;padding:12px" onclick="showForm()">+ Report An Alert</button></div></div>
+
+<div class="liveTicker glass"><span class="dot"></span><span id="tickerText">LIVE - 12 alerts • 71 people confirmed</span></div>
+
+<div class="how glass"><div><div class="howPic"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300"></div><b>1. See</b><p>See alerts near you</p></div><div><div class="howPic"><img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300"></div><b>2. Confirm</b><p>Tap still happening</p></div><div><div class="howPic"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=300"></div><b>3. Report</b><p>Help your neighbours</p></div></div>
+
+<div class="sectionTitle"><b>Quick Actions</b><span>Tap one</span></div>
+<div class="quick">
+<div class="quickBtn glass" onclick="showForm()"><div class="picTop"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400" loading="lazy"></div><span>📢</span><b>Report</b><small>Help others</small></div>
+<div class="quickBtn glass" onclick="setCat('Load Shedding')"><div class="picTop"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400" loading="lazy"></div><span>⚡</span><b>Load Shedding</b><small>Power off</small></div>
+<div class="quickBtn glass" onclick="setCat('Water')"><div class="picTop"><img src="https://images.unsplash.com/photo-1523362628745-0c100150b2d4?w=400" loading="lazy"></div><span>💧</span><b>Water</b><small>No water</small></div>
+<div class="quickBtn glass" onclick="setCat('Pothole')"><div class="picTop"><img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400" loading="lazy"></div><span>🕳️</span><b>Pothole</b><small>Bad road</small></div><div class="quickBtn glass" onclick="setCat('Clinic')"><div class="picTop"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400" loading="lazy"></div><span>🏥</span><b>Clinic</b><small>Stock, queue</small></div>
 </div>
-<p class="small" id="cityInfo" style="margin-top:8px">Showing: All cities</p>
-<div class="grid">
-<div class="card glass" onclick="setCat('Load Shedding')"><b>Load Shedding</b><p>Power off in your area</p></div>
-<div class="card glass" onclick="setCat('Water')"><b>Water Outage</b><p>No water, burst pipe</p></div>
-<div class="card glass" onclick="setCat('Pothole')"><b>Pothole</b><p>Bad road, car danger</p></div>
-<div class="card glass" onclick="setCat('Clinic')"><b>Clinic</b><p>Stock out, long queue</p></div>
+
+<div class="sectionTitle"><b>Trending Now 🔥</b><span>Most confirmed</span></div><div style="display:none"><div class="sectionTitle"><b>Trending Now 🔥</b><span>Most confirmed</span></div>
+<div class="trendRow" id="trendRow"><div class="trendCard glass" onclick="openDetail(0)"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><b>Load Shedding</b><p style="font-size:12px;margin-top:6px">Stage 4 - Power off from 18:00 to 20:30</p><p class="small" style="margin-top:6px">Soshanguve • 12 confirms</p></div><div class="trendCard glass" onclick="openDetail(7)"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><b>Load Shedding</b><p style="font-size:12px;margin-top:6px">Stage 3 - Power off 19:00 to 21:30</p><p class="small" style="margin-top:6px">Gqeberha • 9 confirms</p></div><div class="trendCard glass" onclick="openDetail(1)"><img src="https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600" loading="lazy"><b>Water</b><p style="font-size:12px;margin-top:6px">Burst pipe on Tsamaya Road, no water</p><p class="small" style="margin-top:6px">Mamelodi • 8 confirms</p></div></div>
+
+<div class="sectionTitle"><b>All South Africa - 44 Cities 🇿🇦</b><span>Tap a city</span></div><div class="sectionTitle" style="display:none"><b>All South Africa - 44 Cities 🇿🇦</b><span>Tap a city</span></div>
+<input id="citySearch" class="input" placeholder="🔍 Search city - e.g. Bloemfontein, Gqeberha" oninput="filterCities(this.value)" style="margin-top:10px">
+<div style="display:flex;gap:6px;overflow:auto;margin-top:10px;padding-bottom:4px" id="provRow">
+<button class="chip" onclick="setProv('All',this)" style="cursor:pointer">All SA</button>
+<button class="chip" onclick="setProv('Gauteng',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Gauteng</button>
+<button class="chip" onclick="setProv('Western Cape',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Western Cape</button>
+<button class="chip" onclick="setProv('KwaZulu-Natal',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">KwaZulu-Natal</button>
+<button class="chip" onclick="setProv('Eastern Cape',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Eastern Cape</button>
+<button class="chip" onclick="setProv('Free State',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Free State</button>
+<button class="chip" onclick="setProv('Limpopo',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Limpopo</button>
+<button class="chip" onclick="setProv('Mpumalanga',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Mpumalanga</button>
+<button class="chip" onclick="setProv('North West',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">North West</button>
+<button class="chip" onclick="setProv('Northern Cape',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Northern Cape</button>
 </div>
-<button class="btn" onclick="showForm()">+ Report An Alert</button>
-<div id="form" style="display:none;margin-top:12px">
+</div><button class="delBtn" onclick="clearCity()" style="margin-top:8px">Show All Cities ↺</button><p class="small" id="cityInfo" style="margin-top:8px">Showing: 44 cities - Tap a city to see its alerts</p>
+<div id="cityGridWrap"><div id="cityGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Pretoria')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Pretoria<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Johannesburg')"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Johannesburg<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Soweto')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Soweto<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Centurion')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Centurion<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Sandton')"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Sandton<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Tembisa')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Tembisa<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Soshanguve')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Soshanguve<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Mamelodi')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Mamelodi<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Ekurhuleni')"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600" loading="lazy"><span class="cityBadge">Gauteng</span><div class="cityName">Ekurhuleni<small>Gauteng</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Cape Town')"><img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Cape Town<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Stellenbosch')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Stellenbosch<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Paarl')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Paarl<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('George')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">George<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Knysna')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Knysna<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Mitchells Plain')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Mitchells Plain<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Khayelitsha')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Western Cape</span><div class="cityName">Khayelitsha<small>Western Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Durban')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Durban<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Pietermaritzburg')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Pietermaritzburg<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Richards Bay')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Richards Bay<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Umhlanga')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Umhlanga<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Umlazi')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Umlazi<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Ballito')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">KwaZulu-Natal</span><div class="cityName">Ballito<small>KwaZulu-Natal</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Gqeberha')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">Eastern Cape</span><div class="cityName">Gqeberha<small>Eastern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('East London')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" loading="lazy"><span class="cityBadge">Eastern Cape</span><div class="cityName">East London<small>Eastern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Mthatha')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Eastern Cape</span><div class="cityName">Mthatha<small>Eastern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Makhanda')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><span class="cityBadge">Eastern Cape</span><div class="cityName">Makhanda<small>Eastern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Bloemfontein')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><span class="cityBadge">Free State</span><div class="cityName">Bloemfontein<small>Free State</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Welkom')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Free State</span><div class="cityName">Welkom<small>Free State</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Sasolburg')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Free State</span><div class="cityName">Sasolburg<small>Free State</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Polokwane')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><span class="cityBadge">Limpopo</span><div class="cityName">Polokwane<small>Limpopo</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Tzaneen')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Limpopo</span><div class="cityName">Tzaneen<small>Limpopo</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Thohoyandou')"><img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" loading="lazy"><span class="cityBadge">Limpopo</span><div class="cityName">Thohoyandou<small>Limpopo</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Musina')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Limpopo</span><div class="cityName">Musina<small>Limpopo</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Mbombela')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Mpumalanga</span><div class="cityName">Mbombela<small>Mpumalanga</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Witbank')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Mpumalanga</span><div class="cityName">Witbank<small>Mpumalanga</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Middelburg')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Mpumalanga</span><div class="cityName">Middelburg<small>Mpumalanga</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Secunda')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">Mpumalanga</span><div class="cityName">Secunda<small>Mpumalanga</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Mahikeng')"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600" loading="lazy"><span class="cityBadge">North West</span><div class="cityName">Mahikeng<small>North West</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Rustenburg')"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600" loading="lazy"><span class="cityBadge">North West</span><div class="cityName">Rustenburg<small>North West</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Potchefstroom')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">North West</span><div class="cityName">Potchefstroom<small>North West</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Klerksdorp')"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" loading="lazy"><span class="cityBadge">North West</span><div class="cityName">Klerksdorp<small>North West</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Kimberley')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Northern Cape</span><div class="cityName">Kimberley<small>Northern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Upington')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Northern Cape</span><div class="cityName">Upington<small>Northern Cape</small></div></div><div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('Springbok')"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" loading="lazy"><span class="cityBadge">Northern Cape</span><div class="cityName">Springbok<small>Northern Cape</small></div></div></div>
+
+<div id="form" style="display:none;margin-top:12px" class="glass">
+<div style="padding:14px">
+<b>Report An Alert</b>
 <input id="area" class="input" placeholder="Area - e.g. Soshanguve">
 <input id="title" class="input" placeholder="What happened?">
 <select id="cat" class="input"><option>Load Shedding</option><option>Water</option><option>Pothole</option><option>Clinic</option><option>Road Closed</option></select>
-<button class="btn" onclick="addAlert()">Send Alert</button>
+<input id="photoUrl" class="input" placeholder="Photo link (optional) - paste image link"><button class="btn" onclick="addAlert()">Send Alert</button><button class="delBtn" style="width:100%;padding:12px;margin-top:8px" onclick="closeForm()">Cancel ✕</button>
 </div>
-<input id="search" class="input" placeholder="Search area - e.g. Soshanguve" oninput="setSearch(this.value)" style="margin-top:14px"><div style="display:flex;gap:6px;overflow:auto;margin-top:10px;padding-bottom:4px"><button class="chip" onclick="setFilter('All',this)" id="fAll" style="cursor:pointer">All</button><button class="chip" onclick="setFilter('Load Shedding',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Load Shedding</button><button class="chip" onclick="setFilter('Water',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Water</button><button class="chip" onclick="setFilter('Pothole',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Pothole</button><button class="chip" onclick="setFilter('Clinic',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">Clinic</button></div><p class="small" id="filterInfo" style="margin-top:8px">Showing: All alerts</p><div class="feed"><h3>Near You - Pretoria</h3><div id="list"></div></div>
 </div>
+
+<div style="display:flex;gap:6px;overflow:auto;margin-top:14px;padding-bottom:4px"><button class="chip" onclick="setFilter('All',this)" id="fAll" style="cursor:pointer">All</button><button class="chip" onclick="setFilter('Load Shedding',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">⚡ Load Shedding</button><button class="chip" onclick="setFilter('Water',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">💧 Water</button><button class="chip" onclick="setFilter('Pothole',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">🕳️ Pothole</button><button class="chip" onclick="setFilter('Clinic',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">🏥 Clinic</button></div>
+<p class="small" id="filterInfo" style="margin-top:8px">Showing: All alerts (12)</p>
+
+<div class="feed"><div class="sectionTitle"><b>Near You - Feed</b><span id="countLabel">12 alerts</span></div><div id="list"><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><span>Load Shedding</span></div><div class="alertBody"><b onclick="openDetail(0)" style="cursor:pointer;text-decoration:underline">Stage 4 - Power off from 18:00 to 20:30</b><p class="small" style="margin-top:6px">📍 Soshanguve • Today 17:40</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(0)">✓ Still happening? 12</button><button class="delBtn" onclick="toggleComments(0)">💬 0</button><button class="delBtn" onclick="toggleSave(0)">🔖 Save</button><button class="delBtn" onclick="shareAlert(0)">↗ Share</button><button class="delBtn" onclick="openDetail(0)">👁 View</button><button class="delBtn" onclick="delAlert(0)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600" loading="lazy"><span>Water</span></div><div class="alertBody"><b onclick="openDetail(1)" style="cursor:pointer;text-decoration:underline">Burst pipe on Tsamaya Road, no water</b><p class="small" style="margin-top:6px">📍 Mamelodi • Today 16:10</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(1)">✓ Still happening? 8</button><button class="delBtn" onclick="toggleComments(1)">💬 0</button><button class="delBtn" onclick="toggleSave(1)">🔖 Save</button><button class="delBtn" onclick="shareAlert(1)">↗ Share</button><button class="delBtn" onclick="openDetail(1)">👁 View</button><button class="delBtn" onclick="delAlert(1)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600" loading="lazy"><span>Pothole</span></div><div class="alertBody"><b onclick="openDetail(2)" style="cursor:pointer;text-decoration:underline">Big pothole near Church Square, drive slow</b><p class="small" style="margin-top:6px">📍 Pretoria CBD • Today 14:20</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(2)">✓ Still happening? 5</button><button class="delBtn" onclick="toggleComments(2)">💬 0</button><button class="delBtn" onclick="toggleSave(2)">🔖 Save</button><button class="delBtn" onclick="shareAlert(2)">↗ Share</button><button class="delBtn" onclick="openDetail(2)">👁 View</button><button class="delBtn" onclick="delAlert(2)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><span>Load Shedding</span></div><div class="alertBody"><b onclick="openDetail(3)" style="cursor:pointer;text-decoration:underline">Stage 2 - Power off 20:00 to 22:30</b><p class="small" style="margin-top:6px">📍 Johannesburg - Soweto • Today 18:10</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(3)">✓ Still happening? 6</button><button class="delBtn" onclick="toggleComments(3)">💬 0</button><button class="delBtn" onclick="toggleSave(3)">🔖 Save</button><button class="delBtn" onclick="shareAlert(3)">↗ Share</button><button class="delBtn" onclick="openDetail(3)">👁 View</button><button class="delBtn" onclick="delAlert(3)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600" loading="lazy"><span>Water</span></div><div class="alertBody"><b onclick="openDetail(4)" style="cursor:pointer;text-decoration:underline">Water truck coming at 9am tomorrow</b><p class="small" style="margin-top:6px">📍 Cape Town - Khayelitsha • Today 15:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(4)">✓ Still happening? 4</button><button class="delBtn" onclick="toggleComments(4)">💬 0</button><button class="delBtn" onclick="toggleSave(4)">🔖 Save</button><button class="delBtn" onclick="shareAlert(4)">↗ Share</button><button class="delBtn" onclick="openDetail(4)">👁 View</button><button class="delBtn" onclick="delAlert(4)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600" loading="lazy"><span>Pothole</span></div><div class="alertBody"><b onclick="openDetail(5)" style="cursor:pointer;text-decoration:underline">Road flooded after rain, drive slow</b><p class="small" style="margin-top:6px">📍 Durban - Umlazi • Today 13:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(5)">✓ Still happening? 3</button><button class="delBtn" onclick="toggleComments(5)">💬 0</button><button class="delBtn" onclick="toggleSave(5)">🔖 Save</button><button class="delBtn" onclick="shareAlert(5)">↗ Share</button><button class="delBtn" onclick="openDetail(5)">👁 View</button><button class="delBtn" onclick="delAlert(5)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600" loading="lazy"><span>Water</span></div><div class="alertBody"><b onclick="openDetail(6)" style="cursor:pointer;text-decoration:underline">No water in Heidedal since morning</b><p class="small" style="margin-top:6px">📍 Bloemfontein • Today 12:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(6)">✓ Still happening? 7</button><button class="delBtn" onclick="toggleComments(6)">💬 0</button><button class="delBtn" onclick="toggleSave(6)">🔖 Save</button><button class="delBtn" onclick="shareAlert(6)">↗ Share</button><button class="delBtn" onclick="openDetail(6)">👁 View</button><button class="delBtn" onclick="delAlert(6)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><span>Load Shedding</span></div><div class="alertBody"><b onclick="openDetail(7)" style="cursor:pointer;text-decoration:underline">Stage 3 - Power off 19:00 to 21:30</b><p class="small" style="margin-top:6px">📍 Gqeberha • Today 17:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(7)">✓ Still happening? 9</button><button class="delBtn" onclick="toggleComments(7)">💬 0</button><button class="delBtn" onclick="toggleSave(7)">🔖 Save</button><button class="delBtn" onclick="shareAlert(7)">↗ Share</button><button class="delBtn" onclick="openDetail(7)">👁 View</button><button class="delBtn" onclick="delAlert(7)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600" loading="lazy"><span>Pothole</span></div><div class="alertBody"><b onclick="openDetail(8)" style="cursor:pointer;text-decoration:underline">Pothole on N4 near Riverside Mall</b><p class="small" style="margin-top:6px">📍 Mbombela • Today 11:30</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(8)">✓ Still happening? 4</button><button class="delBtn" onclick="toggleComments(8)">💬 0</button><button class="delBtn" onclick="toggleSave(8)">🔖 Save</button><button class="delBtn" onclick="shareAlert(8)">↗ Share</button><button class="delBtn" onclick="openDetail(8)">👁 View</button><button class="delBtn" onclick="delAlert(8)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600" loading="lazy"><span>Water</span></div><div class="alertBody"><b onclick="openDetail(9)" style="cursor:pointer;text-decoration:underline">Burst pipe in Tlhabane, water truck coming</b><p class="small" style="margin-top:6px">📍 Rustenburg • Today 10:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(9)">✓ Still happening? 5</button><button class="delBtn" onclick="toggleComments(9)">💬 0</button><button class="delBtn" onclick="toggleSave(9)">🔖 Save</button><button class="delBtn" onclick="shareAlert(9)">↗ Share</button><button class="delBtn" onclick="openDetail(9)">👁 View</button><button class="delBtn" onclick="delAlert(9)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600" loading="lazy"><span>Load Shedding</span></div><div class="alertBody"><b onclick="openDetail(10)" style="cursor:pointer;text-decoration:underline">Stage 2 - Power off 18:00 to 20:00</b><p class="small" style="margin-top:6px">📍 Kimberley • Today 16:30</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(10)">✓ Still happening? 6</button><button class="delBtn" onclick="toggleComments(10)">💬 0</button><button class="delBtn" onclick="toggleSave(10)">🔖 Save</button><button class="delBtn" onclick="shareAlert(10)">↗ Share</button><button class="delBtn" onclick="openDetail(10)">👁 View</button><button class="delBtn" onclick="delAlert(10)">Delete</button></div></div></div><div class="alert glass"><div class="alertImg"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600" loading="lazy"><span>Clinic</span></div><div class="alertBody"><b onclick="openDetail(11)" style="cursor:pointer;text-decoration:underline">Clinic closed early, no medication</b><p class="small" style="margin-top:6px">📍 Pietermaritzburg • Today 09:00</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(11)">✓ Still happening? 2</button><button class="delBtn" onclick="toggleComments(11)">💬 0</button><button class="delBtn" onclick="toggleSave(11)">🔖 Save</button><button class="delBtn" onclick="shareAlert(11)">↗ Share</button><button class="delBtn" onclick="openDetail(11)">👁 View</button><button class="delBtn" onclick="delAlert(11)">Delete</button></div></div></div></div></div>
+</div>
+
+
+
+<div id="feedView" style="display:none" class="app">
+<div class="topRow"><div><div style="font-size:12px;opacity:.7">Feed - Live</div><b style="font-size:18px">Near You 🔥</b><div class="small" id="feedMeta">All alerts</div></div><button class="delBtn" onclick="showHome()">Back</button></div>
+<div class="searchBar glass" style="margin-top:12px">🔍 <input id="search2" placeholder="Search feed - e.g. Soshanguve" oninput="setSearch(this.value);document.getElementById('search').value=this.value"></div>
+<div class="feedBar">
+<button class="sortBtn active" id="sortNew" onclick="setSort('new')">🕐 Newest</button>
+<button class="sortBtn" id="sortTop" onclick="setSort('top')">🔥 Most Confirmed</button>
+<button class="sortBtn" id="sortSaved" onclick="setSort('saved')">🔖 Saved</button>
+<button class="sortBtn" onclick="refreshFeed()">↻ Refresh</button>
+</div>
+<div style="display:flex;gap:6px;overflow:auto;margin-top:8px;padding-bottom:4px"><button class="chip" onclick="setFilter('All',this)" style="cursor:pointer">All</button><button class="chip" onclick="setFilter('Load Shedding',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">⚡ Load Shedding</button><button class="chip" onclick="setFilter('Water',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">💧 Water</button><button class="chip" onclick="setFilter('Pothole',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">🕳️ Pothole</button><button class="chip" onclick="setFilter('Clinic',this)" style="cursor:pointer;background:rgba(255,255,255,.15);color:white">🏥 Clinic</button></div>
+<p class="small" id="feedInfo" style="margin-top:8px">Showing alerts</p>
+<div id="feedList"></div>
+</div>
+<div id="profileView" style="display:none" class="app">
+<div class="topRow"><div style="display:flex;gap:10px;align-items:center"><div class="avatar" id="profAvatarSmall">T</div><div><div style="font-size:12px;opacity:.7">Your Profile</div><b style="font-size:16px" id="profNameTop">Tshire</b></div></div><button class="delBtn" onclick="showHome()">Back</button></div>
+<div class="profileCover glass"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600" id="profCoverImg"><div style="position:absolute;bottom:10px;left:12px"><b style="font-size:13px;background:rgba(0,0,0,.6);padding:4px 8px;border-radius:100px" id="profCoverLabel">Pretoria • South Africa</b></div></div><div class="profileCard glass" style="margin-top:14px">
+<div class="profileAvatar" id="profAvatarBig">T</div>
+<h2 id="profName" style="margin-top:10px">Tshire</h2>
+<p class="small" id="profCity">📍 Pretoria, South Africa</p>
+<p style="font-size:13px;margin-top:8px" id="profBio">Pretoria local - Love helping neighbours</p>
+<button class="btn" onclick="shareProfile()" style="background:linear-gradient(135deg,#00e5a8,#00b894);margin-top:8px;padding:12px">↗ Share My Profile</button><button class="btn" onclick="setSort('saved');showFeed()" style="margin-top:8px;padding:12px">🔖 View My Saved Alerts</button><button class="btn" onclick="toggleEdit()" style="margin-top:12px;padding:12px">Edit Profile</button>
+<div id="editForm" style="display:none;text-align:left;margin-top:12px">
+<input id="editName" class="input" placeholder="Your name - e.g. Tshire">
+<input id="editCity" class="input" placeholder="Your city - e.g. Pretoria">
+<input id="editBio" class="input" placeholder="Your bio">
+<select id="editAvatar" class="input"><option value="T">Letter T</option><option value="Cool">Cool</option><option value="Fire">Fire</option><option value="Power">Power</option><option value="SA">SA Flag</option><option value="Lion">Lion</option></select>
+<button class="btn" onclick="saveProfile()">Save Profile</button>
+</div>
+</div>
+<div class="statRow">
+<div class="statBox glass"><b id="statReports">0</b><small>My Reports</small></div>
+<div class="statBox glass"><b id="statConfirms">0</b><small>Confirms</small></div>
+<div class="statBox glass"><b id="statCities">1</b><small>Cities Helped</small></div>
+</div>
+<div class="sectionTitle"><b>My Alerts</b><span>Your reports</span></div>
+<div id="myList"></div>
+<div style="margin-top:14px" class="glass"><div style="padding:14px"><b>Settings</b><p class="small" style="margin-top:6px">Your data stays on your phone.</p><button class="delBtn" style="margin-top:10px;width:100%;padding:12px" onclick="clearMyAlerts()">Clear My Alerts</button><button class="delBtn" style="margin-top:8px;width:100%;padding:12px" onclick="resetProfile()">Reset Profile</button></div></div>
+</div>
+
+<div id="notifPanel" class="notifPanel glass" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center"><b>Notifications 🔔</b><button class="delBtn" onclick="closeNotifications()">Close ✕</button></div>
+<div id="notifList" style="margin-top:10px"></div>
+<button class="btn" onclick="closeNotifications();showFeed()" style="padding:12px">See All Alerts →</button>
+</div>
+<div id="detailModal" class="modal" onclick="if(event.target===this) closeDetail()"><div class="modalCard glass"><div style="display:flex;justify-content:space-between"><b id="detailTitle">Alert</b><button class="delBtn" onclick="closeDetail()">Close ✕</button></div><div id="detailBody" style="margin-top:10px"></div></div></div>
+<div class="bottomNav glass"><div class="navI active" onclick="showHome()">🏠<br>Home</div><div class="navI" onclick="showFeed()">🔥<br>Feed</div><div class="navI" onclick="showHome();showForm();window.scrollTo({top:0,behavior:'smooth'})" style="background:#ff2a45;color:white;opacity:1">+<br>Report</div><div class="navI" onclick="showCities()">🌍<br>Cities</div><div class="navI" onclick="showProfile()">👤<br>You</div></div>
 <script>
-let alerts = JSON.parse(localStorage.getItem('mzansi_alerts')||'[]');
+let alerts = JSON.parse(localStorage.getItem('mzansi_alerts')||'[]'); alerts.forEach((a,i)=>{ if(!a.comments) a.comments=[]; if(a.saved===undefined) a.saved=false; if(!a.author) a.author='Neighbour'; });
 if(alerts.length===0){
  alerts=[
-  {cat:'Load Shedding',area:'Soshanguve',title:'Stage 4 - Power off from 18:00 to 20:30',time:'Today 17:40'},
-  {cat:'Water',area:'Mamelodi',title:'Burst pipe on Tsamaya Road, no water',time:'Today 16:10'},
-  {cat:'Pothole',area:'Pretoria CBD',title:'Big pothole near Church Square, drive slow',time:'Today 14:20'},
-  {cat:'Load Shedding',area:'Johannesburg - Soweto',title:'Stage 2 - Power off 20:00 to 22:30',time:'Today 18:10'},
-  {cat:'Water',area:'Cape Town - Khayelitsha',title:'Water truck coming at 9am tomorrow',time:'Today 15:00'},
-  {cat:'Pothole',area:'Durban - Umlazi',title:'Road flooded after rain, drive slow',time:'Today 13:00'}
+  {cat:'Load Shedding',area:'Soshanguve',title:'Stage 4 - Power off from 18:00 to 20:30',time:'Today 17:40',confirms:12},
+  {cat:'Water',area:'Mamelodi',title:'Burst pipe on Tsamaya Road, no water',time:'Today 16:10',confirms:8},
+  {cat:'Pothole',area:'Pretoria CBD',title:'Big pothole near Church Square, drive slow',time:'Today 14:20',confirms:5},
+  {cat:'Load Shedding',area:'Johannesburg - Soweto',title:'Stage 2 - Power off 20:00 to 22:30',time:'Today 18:10',confirms:6},
+  {cat:'Water',area:'Cape Town - Khayelitsha',title:'Water truck coming at 9am tomorrow',time:'Today 15:00',confirms:4},
+  {cat:'Pothole',area:'Durban - Umlazi',title:'Road flooded after rain, drive slow',time:'Today 13:00',confirms:3},
+  {cat:'Water',area:'Bloemfontein',title:'No water in Heidedal since morning',time:'Today 12:00',confirms:7},
+  {cat:'Load Shedding',area:'Gqeberha',title:'Stage 3 - Power off 19:00 to 21:30',time:'Today 17:00',confirms:9},
+  {cat:'Pothole',area:'Mbombela',title:'Pothole on N4 near Riverside Mall',time:'Today 11:30',confirms:4},
+  {cat:'Water',area:'Rustenburg',title:'Burst pipe in Tlhabane, water truck coming',time:'Today 10:00',confirms:5},
+  {cat:'Load Shedding',area:'Kimberley',title:'Stage 2 - Power off 18:00 to 20:00',time:'Today 16:30',confirms:6},
+  {cat:'Clinic',area:'Pietermaritzburg',title:'Clinic closed early, no medication',time:'Today 09:00',confirms:2}
  ];
 }
-let curFilter='All'; let curSearch=''; let curCity='All'; function setCity(c){curCity=c; let info=document.getElementById('cityInfo'); if(info) info.textContent='Showing city: '+c+' - Tap All to clear'; render(); document.getElementById('list').scrollIntoView({behavior:'smooth'});}
+function imgFor(cat){
+ if(cat==='Load Shedding') return 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600';
+ if(cat==='Water') return 'https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=600';
+ if(cat==='Pothole') return 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600';
+ if(cat==='Clinic') return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600';
+ if(cat==='Road Closed') return 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600';
+ return 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600';
+}
+
+let allCities=[
+{name:'Pretoria',prov:'Gauteng',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Johannesburg',prov:'Gauteng',img:'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600'},
+{name:'Soweto',prov:'Gauteng',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Centurion',prov:'Gauteng',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Sandton',prov:'Gauteng',img:'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600'},
+{name:'Tembisa',prov:'Gauteng',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Soshanguve',prov:'Gauteng',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Mamelodi',prov:'Gauteng',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Ekurhuleni',prov:'Gauteng',img:'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600'},
+{name:'Cape Town',prov:'Western Cape',img:'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600'},
+{name:'Stellenbosch',prov:'Western Cape',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Paarl',prov:'Western Cape',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'George',prov:'Western Cape',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Knysna',prov:'Western Cape',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Mitchells Plain',prov:'Western Cape',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Khayelitsha',prov:'Western Cape',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Durban',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Pietermaritzburg',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Richards Bay',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Umhlanga',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Umlazi',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Ballito',prov:'KwaZulu-Natal',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Gqeberha',prov:'Eastern Cape',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'East London',prov:'Eastern Cape',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'},
+{name:'Mthatha',prov:'Eastern Cape',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Makhanda',prov:'Eastern Cape',img:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600'},
+{name:'Bloemfontein',prov:'Free State',img:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600'},
+{name:'Welkom',prov:'Free State',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Sasolburg',prov:'Free State',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Polokwane',prov:'Limpopo',img:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600'},
+{name:'Tzaneen',prov:'Limpopo',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Thohoyandou',prov:'Limpopo',img:'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600'},
+{name:'Musina',prov:'Limpopo',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Mbombela',prov:'Mpumalanga',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Witbank',prov:'Mpumalanga',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Middelburg',prov:'Mpumalanga',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Secunda',prov:'Mpumalanga',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Mahikeng',prov:'North West',img:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600'},
+{name:'Rustenburg',prov:'North West',img:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600'},
+{name:'Potchefstroom',prov:'North West',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Klerksdorp',prov:'North West',img:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600'},
+{name:'Kimberley',prov:'Northern Cape',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Upington',prov:'Northern Cape',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'},
+{name:'Springbok',prov:'Northern Cape',img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600'}
+];
+let curProv='All'; let curCitySearch='';
+function renderCities(){
+ let grid=document.getElementById('cityGrid'); if(!grid) return;
+ let shown=allCities.filter(c=>(curProv==='All'||c.prov===curProv) && (!curCitySearch || c.name.toLowerCase().includes(curCitySearch)));
+ grid.innerHTML=shown.map(c=>`<div class="cityCard glass" style="min-width:0;height:140px" onclick="setCity('${c.name}')"><img src="${c.img}" loading="lazy"><span class="cityBadge">${c.prov}</span><div class="cityName">${c.name}<small>${c.prov}</small></div></div>`).join('');
+ let info=document.getElementById('cityInfo'); if(info) info.textContent='Showing: '+shown.length+' cities'+(curProv!=='All'?' - '+curProv:'')+(curCitySearch?' - Search: '+curCitySearch:'')+' - Tap a city to see its alerts';
+}
+function setProv(p,el){curProv=p; document.querySelectorAll('#provRow .chip').forEach(ch=>{ch.style.background='rgba(255,255,255,.15)';ch.style.color='white';}); if(el){el.style.background='white';el.style.color='black';} renderCities();}
+function filterCities(v){curCitySearch=v.toLowerCase().trim(); renderCities();}
+let curFilter='All'; let curSearch=''; let curCity='All';
+function setCity(c){curCity=c; let info=document.getElementById('cityInfo'); if(info) info.textContent='Showing city: '+c+' - Tap All to clear'; render(); document.getElementById('list').scrollIntoView({behavior:'smooth'});}
 function setSearch(v){curSearch=v.toLowerCase().trim(); render();}
-function render(){
- let list=document.getElementById('list');
- let shown=alerts.filter(a=>{let okCat=(curFilter==='All'||a.cat===curFilter); let okSearch=(!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch)); let okCity=true; if(curCity!=='All'){ if(curCity==='Pretoria'){ okCity = a.area.includes('Pretoria')||a.area.includes('Soshanguve')||a.area.includes('Mamelodi')||a.area.includes('Centurion'); } else { okCity = a.area.toLowerCase().includes(curCity.toLowerCase()); } } return okCat && okSearch && okCity;});
- if(shown.length===0){list.innerHTML='<div class="alert glass"><p class="small">No alerts in this category yet. Be first to report.</p></div>';}else{list.innerHTML = shown.map(a=>{let idx=alerts.indexOf(a); return `<div class="alert glass"><span class="chip">${a.cat}</span><br><b>${a.title}</b><p class="small">${a.area} - ${a.time}</p><button onclick="delAlert(${idx})" style="margin-top:8px;padding:6px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:11px;cursor:pointer">Delete</button></div>`;}).join('');}
- let info=document.getElementById('filterInfo'); if(info) info.textContent='Showing: '+curFilter+' alerts ('+shown.length+')'+(curSearch?' - Search: '+curSearch:'')+(curCity!=='All'?' - City: '+curCity:'');
+
+let profile = JSON.parse(localStorage.getItem('mzansi_profile')||'null') || {name:'Tshire', city:'Pretoria', bio:'Pretoria local - Love helping neighbours', avatar:'T'};
+function updateProfileUI(){
+ let av = profile.avatar || 'T';
+ let big=document.getElementById('profAvatarBig'); if(big) big.textContent=av;
+ let small=document.getElementById('profAvatarSmall'); if(small) small.textContent=av;
+ let pn=document.getElementById('profName'); if(pn) pn.textContent=profile.name;
+ let pnt=document.getElementById('profNameTop'); if(pnt) pnt.textContent=profile.name;
+ let coverImg=document.getElementById('profCoverImg'); if(coverImg){ let found=allCities.find(c=>c.name===profile.city); if(found) coverImg.src=found.img; let lbl=document.getElementById('profCoverLabel'); if(lbl) lbl.textContent=profile.city+' • South Africa'; } let pc=document.getElementById('profCity'); if(pc) pc.textContent='📍 '+profile.city+', South Africa';
+ let pb=document.getElementById('profBio'); if(pb) pb.textContent=profile.bio;
 }
-function setFilter(c,el){curFilter=c;document.querySelectorAll('.chip').forEach(ch=>{if(ch.id!=='fAll'&&ch.parentElement&&ch.parentElement.style&&ch.parentElement.style.display==='flex'){ch.style.background='rgba(255,255,255,.15)';ch.style.color='white';}});if(el){el.style.background='white';el.style.color='black';}render();}
-function delAlert(i){if(!confirm('Delete this alert?'))return; alerts.splice(i,1); localStorage.setItem('mzansi_alerts',JSON.stringify(alerts)); render();}
-function showForm(){let f=document.getElementById('form'); f.style.display = f.style.display==='none' ? 'block':'none';}
-function setCat(c){setFilter(c,null); document.getElementById('list').scrollIntoView({behavior:'smooth'});}
-function addAlert(){
- let area=document.getElementById('area').value.trim();
- let title=document.getElementById('title').value.trim();
- let cat=document.getElementById('cat').value;
- if(!area||!title){alert('Please fill area and what happened');return;}
- curFilter='All'; alerts.unshift({cat:cat,area:area,title:title,time:'Just now'});
+function showProfile(){
+ document.getElementById('feedView').style.display='none';
+ document.querySelector('.app').style.display='none';
+ document.getElementById('profileView').style.display='block';
+ updateProfileUI(); renderMyAlerts();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function showHome(){
+ document.getElementById('feedView').style.display='none';
+ document.getElementById('profileView').style.display='none';
+ document.querySelector('.app').style.display='block';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleEdit(){
+ let f=document.getElementById('editForm'); f.style.display = f.style.display==='none' ? 'block':'none';
+ if(f.style.display==='block'){ document.getElementById('editName').value=profile.name; document.getElementById('editCity').value=profile.city; document.getElementById('editBio').value=profile.bio; }
+}
+function saveProfile(){
+ let n=document.getElementById('editName').value.trim() || 'Tshire';
+ let c=document.getElementById('editCity').value.trim() || 'Pretoria';
+ let b=document.getElementById('editBio').value.trim() || 'Pretoria local';
+ let a=document.getElementById('editAvatar').value || 'T';
+ profile={name:n,city:c,bio:b,avatar:a};
+ localStorage.setItem('mzansi_profile',JSON.stringify(profile));
+ updateProfileUI(); renderMyAlerts();
+ document.getElementById('editForm').style.display='none';
+ alert('Profile saved! Sawubona '+n);
+}
+function resetProfile(){
+ if(!confirm('Reset profile to default?')) return;
+ profile={name:'Tshire',city:'Pretoria',bio:'Pretoria local - Love helping neighbours',avatar:'T'};
+ localStorage.setItem('mzansi_profile',JSON.stringify(profile)); updateProfileUI(); renderMyAlerts();
+}
+function clearMyAlerts(){
+ if(!confirm('Delete all YOUR alerts?')) return;
+ alerts = alerts.filter(a=>!a.my);
+ localStorage.setItem('mzansi_alerts',JSON.stringify(alerts)); render(); renderMyAlerts(); alert('Your alerts cleared');
+}
+function renderMyAlerts(){
+ let my = alerts.filter(a=>a.my || a.author===profile.name);
+ document.getElementById('statReports').textContent = my.length;
+ document.getElementById('statConfirms').textContent = my.reduce((s,a)=>s+(a.confirms||0),0);
+ let cities = new Set(my.map(a=>a.area)); document.getElementById('statCities').textContent = cities.size || 1;
+ let list=document.getElementById('myList');
+ if(my.length===0){ list.innerHTML='<div class="alert glass"><div class="alertBody"><p class="small">You have no reports yet. Tap Report and be first!</p><button class="btn" onclick="showHome();showForm()">+ Report Now</button></div></div>'; }
+ else { list.innerHTML = my.map(a=>{let idx=alerts.indexOf(a); return `<div class="alert glass"><div class="alertBody"><b onclick="openDetail(${idx})" style="cursor:pointer;text-decoration:underline">${a.title}</b><p class="small" style="margin-top:6px">${a.area} - ${a.time} - ${a.confirms||0} confirms</p><div style="display:flex;gap:8px;margin-top:10px"><button class="confirmBtn" onclick="confirmAlert(${idx});renderMyAlerts()">Confirm ${a.confirms||0}</button><button class="delBtn" onclick="delAlert(${idx});renderMyAlerts()">Delete</button></div></div></div>`;}).join(''); }
+}
+
+
+let curSort='new';
+function showFeed(){
+ document.querySelector('.app').style.display='none';
+ document.getElementById('profileView').style.display='none';
+ document.getElementById('feedView').style.display='block';
+ renderFeed();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function setSort(s){
+ curSort=s;
+ document.getElementById('sortNew').classList.toggle('active', s==='new');
+ document.getElementById('sortTop').classList.toggle('active', s==='top');
+ document.getElementById('sortSaved').classList.toggle('active', s==='saved');
+ renderFeed();
+}
+function refreshFeed(){
+ let m=document.getElementById('feedMeta'); if(m) m.textContent='Updated just now • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+ renderFeed(); alert('Feed refreshed!');
+}
+function toggleSave(i){
+ alerts[i].saved = !alerts[i].saved;
  localStorage.setItem('mzansi_alerts',JSON.stringify(alerts));
- render(); document.getElementById('form').style.display='none';
- document.getElementById('area').value=''; document.getElementById('title').value='';
- alert('Thank you! Alert posted for '+area);
+ render(); renderFeed(); if(document.getElementById('profileView').style.display==='block') renderMyAlerts();
 }
-render();
-</script>
-</body>
-</html>
+function shareAlert(i){
+ let a=alerts[i];
+ let txt = a.title + ' - ' + a.area + ' - via Mzansi Alert';
+ if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>alert('Copied! Share it: '+txt));
+ else alert(txt);
+}
+function toggleComments(i){
+ let el=document.getElementById('comments-'+i); if(!el) return;
+ el.style.display = el.style.display==='none' ? 'block':'none';
+}
+function addComment(i){
+ let inp=document.getElementById('cinput-'+i);
+ let val=inp.value.trim(); if(!val){alert('Write a comment first');return;}
+ if(!alerts[i].comments) alerts[i].comments=[];
+ alerts[i].comments.push({text:val, by: profile.name, time:'Just now'});
+ localStorage.setItem('mzansi_alerts',JSON.stringify(alerts));
+ render(); renderFeed();
+}
+function renderFeed(){
+ let list=document.getElementById('feedList'); if(!list) return;
+ let shown=alerts.filter(a=>{
+  let okCat=(curFilter==='All'||a.cat===curFilter);
+  let okSearch=(!curSearch || a.area.toLowerCase().includes(curSearch) || a.title.toLowerCase().includes(curSearch));
+  let okCity=true; if(curCity!=='All'){ if(curCity==='Pretoria'){ okCity = a.area.includes('Pretoria')||a.area.includes('Soshanguve')||a.area.includes('Mamelodi')||a.area.includes('Centurion'); } else { okCity = a.area.toLowerCase().includes(curCity.toLowerCase()); } }
+  let okSaved=true; if(curSort==='saved') okSaved=!!a.saved;
+  return okCat && okSearch && okCity && okSaved;
+ });
+ if(curSort==='top') shown=[...shown].sort((a,b)=>(b.confirms||0)-(a.confirms||0));
+ // new is already newest first (unshift)
+ if(shown.length===0){
+  list.innerHTML='<div class="alert glass"><div class="alertBody"><p class="small">No alerts here. Try All or Report one!</p><button class="btn" onclick="showHome();showForm()">+ Report Now</button></div></div>';
+ } else {
+  list.innerHTML=shown.map(a=>{
+   let idx=alerts.indexOf(a);
+   let comments = a.comments||[];
+   let cHtml = comments.map(c=>`<div style="font-size:12px;margin-top:6px"><b>${c.by}:</b> ${c.text} <span class="small">• ${c.time}</span></div>`).join('');
+   return `<div class="alert glass"><div class="alertImg"><img src="${a.photo||imgFor(a.cat)}" loading="lazy"><span>${a.cat}</span></div><div class="alertBody"><b onclick="openDetail(${idx})" style="cursor:pointer;text-decoration:underline">${a.title}</b><p class="small" style="margin-top:6px">📍 ${a.area} • ${a.time} • by ${a.author||'Neighbour'}</p><div class="actionRow"><button class="confirmBtn" onclick="confirmAlert(${idx});renderFeed()">✓ Still happening? ${a.confirms||0}</button><button class="delBtn" onclick="toggleComments(${idx})">💬 ${comments.length} Comments</button><button class="delBtn" onclick="toggleSave(${idx})">${a.saved?'🔖 Saved':'🔖 Save'}</button><button class="delBtn" onclick="shareAlert(${idx})">↗ Share</button></div><div id="comments-${idx}" class="commentBox" style="display:none"><b style="font-size:12px">Comments (${comments.length})</b>${cHtml}<input id="cinput-${idx}" class="commentInput" placeholder="Write a comment..."><button class="btn" style="margin-top:8px;padding:10px" onclick="addComment(${idx})">Send Comment</button></div></div></div>`;
+  }).join('');
+ }
+ let info=document.getElementById('feedInfo'); if(info) info.textContent='Showing: '+shown.length+' alerts • Sort: '+(curSort==='top'?'Most Confirmed':curSort==='saved'?'Saved':'Newest')+(curFilter!=='All'?' • '+curFilter:'')+(curCity!=='All'?' • '+curCity:'');
+ let meta=document.getElementById('feedMeta'); if(meta) meta.textContent=shown.length+' alerts • '+alerts.reduce((s,a)=>s+(a.confirms||0),0)+' confirms';
+}
+
+
+
+function showCities(){
+ showHome();
+ setTimeout(()=>{ let w=document.getElementById('cityGridWrap'); if(w){ w.style.display='block'; w.scrollIntoView({behavior:'smooth'}); } }, 100);
+}
+
+function toggleCities(){
+ let w=document.getElementById('cityGridWrap'); w.style.display = w.style.display==='none' ? 'block':'none';
+ if(w.style.display==='block') w.scrollIntoView({behavior:'smooth'});
+}
+function renderFeaturedCities(){
+ let el=document.getElementById('featuredCities'); if(!el) return;
+ let feat=['Pretoria','Johannesburg','Cape Town','Durban'];
+ el.innerHTML=feat.map(name=>{
+  let c=allCities.find(x=>x.name===name); if(!c) return '';
+  return `<div class="cityCard glass" style="min-width:0;height:120px" onclick="setCity('${c.name}');showFeed()"><img src="${c.img}" loading="lazy"><div class="cityName">${c.name}<small>${c.prov}</small></div></div>`;
+ }).join('');
+}
+
+
+function showNotifications(){
+ let p=document.getElementById('notifPanel'); p.style.display='block';
+ let list=document.getElementById('notifList');
+ let recent=alerts.slice(0,3);
+ list.innerHTML=recent.map(a=>`<div style="padding:10px;border-radius:14px;background:rgba(255,255,255,.08);margin-top:8px;cursor:pointer" onclick="closeNotifications();openDetail(${alerts.indexOf(a)})"><b>${a.cat}</b><p style="font-size:12px;margin-top:4px">${a.title}</p><p class="small">${a.area} • ${a.time}</p></div>`).join('');
+ let c=document.getElementById('notifCount'); if(c) c.style.display='none';
+}
+function closeNotifications(){ document.getElementById('notifPanel').style.display='none'; }
+function openDetail(i){
+ let a=alerts[i]; if(!a) return;
+ document.getElementById('detailTitle').textContent=a.cat+' - '+a.area;
+ document.getElementById('detailBody').innerHTML=`<div class="alertImg" style="border-radius:14px;overflow:hidden;height:140px"><img src="${imgFor(a.cat)}" style="width:100%;height:100%;object-fit:cover"></div><h3 style="margin-top:10px">${a.title}</h3><p class="small" style="margin-top:6px">📍 ${a.area} • ${a.time} • by ${a.author||'Neighbour'}</p><p style="font-size:13px;margin-top:8px">Confirms: ${a.confirms||0} • Comments: ${(a.comments||[]).length} • Saved: ${a.saved?'Yes':'No'}</p><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="confirmBtn" onclick="confirmAlert(${i});openDetail(${i})">✓ Still happening? ${a.confirms||0}</button><button class="delBtn" onclick="toggleSave(${i});openDetail(${i})">${a.saved?'🔖 Saved':'🔖 Save'}</button><button class="delBtn" onclick="shareAlert(${i})">↗ Share</button><button class="delBtn" onclick="toggleComments(${i});openDetail(${i})">💬 Comments</button></div><button class="btn" onclick="closeDetail();showFeed()">See in Feed →</button>`;
+ document.getElementById('detailModal').style.display='flex';
+}
+function closeDetail(){ document.getElementById('detailModal').style.display='none'; }
+fun
